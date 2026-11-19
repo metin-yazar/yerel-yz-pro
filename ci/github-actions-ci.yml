@@ -1,0 +1,22 @@
+name: Full-Stack AI CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python 3.12 Kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Bağımlılıkları Yükle
+        run: pip install -r backend/requirements.txt
+      - name: Birim Testlerini Çalıştır
+        working-directory: backend
+        run: PYTHONPATH=. pytest -v
