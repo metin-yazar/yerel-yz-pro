@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Yapay Zeka Uygulamam — v0.2 Otonom Full-Stack Stüdyo</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .tab-active { background-color: #4f46e5; color: #ffffff; }
+    .tab-inactive { color: #475569; background-color: transparent; }
+    .tab-inactive:hover { background-color: #f1f5f9; color: #0f172a; }
+    .chat-scroll::-webkit-scrollbar { width: 6px; }
+    .chat-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <!-- Üst Başlık -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-20">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+          YZ
+        </div>
+        <div class="min-w-0">
+          <h1 id="headerAppName" class="font-bold text-slate-900 text-base truncate">Yapay Zeka Uygulamam</h1>
+          <p class="text-xs text-slate-500 flex items-center gap-1.5">
+            <span id="modeDot" class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span id="modeLabel">v0.2 • Otonom Yerel Mod</span>
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <span id="draftCountBadge" class="text-xs font-semibold px-2 py-1 rounded-full bg-amber-50 text-amber-700 hidden">
+          0 Taslak
+        </span>
+        <span id="kbCountBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700">
+          3 Veri
+        </span>
+      </div>
+    </div>
+
+    <!-- Sekmeler (5 temiz sekme) -->
+    <nav class="max-w-3xl mx-auto px-3 pb-2.5 grid grid-cols-5 gap-1" aria-label="Ana sekmeler">
+      <button type="button" data-tab="chat" class="tab-btn tab-active text-[11px] sm:text-sm font-medium py-2 px-1 rounded-lg transition text-center">
+        Test
+      </button>
+      <button type="button" data-tab="auto" class="tab-btn tab-inactive text-[11px] sm:text-sm font-medium py-2 px-1 rounded-lg transition text-center">
+        Otonom
+      </button>
+      <button type="button" data-tab="data" class="tab-btn tab-inactive text-[11px] sm:text-sm font-medium py-2 px-1 rounded-lg transition text-center">
+        Veriler
+      </button>
+      <button type="button" data-tab="brain" class="tab-btn tab-inactive text-[11px] sm:text-sm font-medium py-2 px-1 rounded-lg transition text-center">
+        Talimat
+      </button>
+      <button type="button" data-tab="github" class="tab-btn tab-inactive text-[11px] sm:text-sm font-medium py-2 px-1 rounded-lg transition text-center">
+        GitHub
+      </button>
+    </nav>
+  </header>
+
+  <!-- Ana İçerik -->
+  <main class="max-w-3xl w-full mx-auto px-4 py-4 flex-1 flex flex-col">
+
+    <!-- 1. TEST SOHBETİ SEKMESİ -->
+    <section id="panel-chat" class="tab-panel flex-1 flex flex-col gap-3">
+      <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-col flex-1 shadow-sm min-h-[420px]">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">Canlı Test</span>
+            <label class="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full cursor-pointer">
+              <input id="autoLearnToggle" type="checkbox" checked class="accent-indigo-600 rounded" />
+              <span>Sohbetten Öğren</span>
+            </label>
+          </div>
+          <button type="button" id="clearChatBtn" class="text-xs font-medium text-slate-500 hover:text-rose-600 transition">
+            Sohbeti Temizle
+          </button>
+        </div>
+
+        <div id="chatMessages" class="chat-scroll flex-1 overflow-y-auto space-y-3 pr-1 max-h-[430px]">
+          <!-- Mesajlar JS ile dolar -->
+        </div>
+
+        <!-- Hızlı Test Soruları -->
+        <div class="mt-3 pt-2.5 border-t border-slate-100">
+          <p class="text-[11px] font-medium text-slate-400 mb-1.5">Hızlı test veya öğretme örnekleri:</p>
+          <div id="quickPrompts" class="flex flex-wrap gap-1.5">
+            <button type="button" class="quick-prompt-btn text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1.5 rounded-lg transition">
+              Sen kimsin, ne yapabilirsin?
+            </button>
+            <button type="button" class="quick-prompt-btn text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1.5 rounded-lg transition">
+              Yeni kural: Müşteri destek yanıtları en fazla 3 cümle olmalı.
+            </button>
+            <button type="button" class="quick-prompt-btn text-xs bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 px-2.5 py-1.5 rounded-lg transition">
+              GitHub bağlantısı nasıl çalışır?
+            </button>
+          </div>
+        </div>
+
+        <!-- Mesaj Gönderme Formu -->
+        <form id="chatForm" class="mt-3 flex gap-2">
+          <input
+            id="chatInput"
+            type="text"
+            placeholder="Soru sor veya yeni bir kural öğret..."
+            autocomplete="off"
+            class="flex-1 rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          <button
+            type="submit"
+            id="sendBtn"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition shrink-0"
+          >
+            Gönder
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. OTONOM VERİ ÜRETİCİ & TASLAK HAVUZU SEKMESİ -->
+    <section id="panel-auto" class="tab-panel hidden space-y-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <h2 class="font-semibold text-slate-900 text-sm">Otonom Veri Üretici (Self-Data Pipeline)</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Konuyu yaz; yapay zeka kendi bilgi tabanı ve ince ayar (JSONL) taslaklarını otomatik üretsin.</p>
+          </div>
+          <button type="button" id="exportJsonlBtn" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition shrink-0">
+            JSONL İndir
+          </button>
+        </div>
+
+        <form id="synthForm" class="space-y-2.5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input id="synthTopic" type="text" required placeholder="Konu (Örn: İade Politikası, Finans Asistanı)" class="sm:col-span-2 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <select id="synthCount" class="rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="3">3 Kayıt Üret</option>
+              <option value="5">5 Kayıt Üret</option>
+            </select>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <label class="inline-flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
+              <input id="synthAutoApprove" type="checkbox" class="accent-indigo-600 rounded" />
+              <span>Onay beklemeden doğrudan bilgi tabanına ekle</span>
+            </label>
+            <button type="submit" id="synthBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm px-4 py-2 rounded-xl transition">
+              Otonom Veri Üret
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Aday / Taslak Veriler -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <h2 class="font-semibold text-slate-900 text-sm">Onay Bekleyen Otonom Taslaklar</h2>
+          <button type="button" id="approveAllDraftsBtn" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg transition">
+            Tümünü Onayla
+          </button>
+        </div>
+        <div id="draftList" class="space-y-2.5">
+          <!-- Taslaklar JS ile dolar -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. VERİ / BİLGİ TABANI SEKMESİ -->
+    <section id="panel-data" class="tab-panel hidden space-y-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="font-semibold text-slate-900 text-sm">Manuel Bilgi / Veri Ekle</h2>
+          <div class="flex gap-2">
+            <label for="importJsonInput" class="cursor-pointer text-xs font-medium px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+              JSON Yükle
+            </label>
+            <input id="importJsonInput" type="file" accept=".json,application/json" class="hidden" />
+            <button type="button" id="exportDataBtn" class="text-xs font-medium px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">
+              JSON İndir
+            </button>
+          </div>
+        </div>
+
+        <form id="addDataForm" class="space-y-2.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <input id="dataTitle" type="text" required placeholder="Başlık (Örn: Ürün Fiyatları)" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input id="dataCategory" type="text" placeholder="Kategori (Örn: SSS, Kural, Ürün)" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <input id="dataKeywords" type="text" placeholder="Anahtar kelimeler (virgülle ayır: fiyat, saat, destek)" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <textarea id="dataContent" rows="3" required placeholder="Yapay zekanın bu konuda bilmesi gereken net bilgi..." class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+          <button type="submit" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-4 py-2 rounded-xl transition">
+            Bilgi Tabanına Kaydet
+          </button>
+        </form>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <h2 class="font-semibold text-slate-900 text-sm">Onaylı Bilgi Tabanı</h2>
+          <input id="searchDataInput" type="search" placeholder="Verilerde ara..." class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-56" />
+        </div>
+        <div id="dataList" class="space-y-2.5">
+          <!-- Kartlar JS ile dolar -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. SİSTEM TALİMATI (BEYİN) SEKMESİ -->
+    <section id="panel-brain" class="tab-panel hidden space-y-4">
+      <form id="brainForm" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3.5">
+        <h2 class="font-semibold text-slate-900 text-sm">Yapay Zeka Kimliği ve Model Motoru</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="appNameInput" class="block text-xs font-medium text-slate-600 mb-1">Uygulama / Asistan Adı</label>
+            <input id="appNameInput" type="text" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label for="toneSelect" class="block text-xs font-medium text-slate-600 mb-1">Konuşma Tonu</label>
+            <select id="toneSelect" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="samimi">Samimi ve Yardımsever</option>
+              <option value="resmi">Resmi ve Kurumsal</option>
+              <option value="kisa">Kısa ve Net</option>
+              <option value="teknik">Teknik ve Detaylı</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="systemPromptInput" class="block text-xs font-medium text-slate-600 mb-1">Sistem Talimatı (System Prompt)</label>
+          <textarea id="systemPromptInput" rows="4" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+          <p id="promptStats" class="text-[11px] text-slate-400 mt-1">0 karakter</p>
+        </div>
+
+        <div>
+          <label for="fallbackInput" class="block text-xs font-medium text-slate-600 mb-1">Veri Bulunamadığında Verilecek Yanıt</label>
+          <input id="fallbackInput" type="text" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+
+        <div class="border-t border-slate-100 pt-3">
+          <label for="apiKeyInput" class="block text-xs font-medium text-slate-600 mb-1">
+            İsteğe Bağlı: Gemini API Anahtarı (Canlı Bulut Modeli)
+          </label>
+          <input id="apiKeyInput" type="password" placeholder="Boş bırakırsan Otonom Yerel Mod çalışır" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <p class="text-[11px] text-slate-500 mt-1">
+            Full-stack paketi sunucuda çalıştırdığında <strong>Ollama</strong> ile tamamen bağımsız yerel model de kullanabilirsin.
+          </p>
+        </div>
+
+        <button type="submit" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition">
+          Ayarları Kaydet
+        </button>
+      </form>
+    </section>
+
+    <!-- 5. GITHUB & FULL-STACK MİMARİ SEKMESİ -->
+    <section id="panel-github" class="tab-panel hidden space-y-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+        <h2 class="font-semibold text-slate-900 text-sm">GitHub Full-Stack Depo Bağlantısı</h2>
+        <form id="githubForm" class="flex flex-col sm:flex-row gap-2">
+          <input id="githubRepoInput" type="url" placeholder="https://github.com/kullanici-adin/bagimsiz-yz-fullstack" class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm px-4 py-2 rounded-xl transition shrink-0">
+            Depoyu Kaydet
+          </button>
+        </form>
+
+        <div id="savedRepoBox" class="hidden text-xs bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl px-3 py-2 flex items-center justify-between gap-2">
+          <span class="truncate">Kayıtlı Depo: <strong id="savedRepoText"></strong></span>
+          <a id="savedRepoLink" href="https://github.com" target="_blank" rel="noopener noreferrer" class="font-semibold underline shrink-0">Aç</a>
+        </div>
+      </div>
+
+      <!-- Full-Stack Mimari Özeti -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+        <h2 class="font-semibold text-slate-900 text-sm">Full-Stack Paket Yapısı (v0.2)</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+            <p class="font-semibold text-slate-900">frontend/index.html</p>
+            <p class="text-slate-600 mt-0.5">Mobil uyumlu canlı test, otonom veri üretimi ve yönetim paneli</p>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+            <p class="font-semibold text-slate-900">backend/app/main.py</p>
+            <p class="text-slate-600 mt-0.5">FastAPI REST API (/chat, /knowledge, /autonomous/synthesize, /export/jsonl)</p>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+            <p class="font-semibold text-slate-900">backend/app/ai_engine.py</p>
+            <p class="text-slate-600 mt-0.5">Bağımsız Ollama LLM / Gemini / Yerel RAG motoru ve bilgi çıkarıcı</p>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+            <p class="font-semibold text-slate-900">Docker + GitHub Actions CI</p>
+            <p class="text-slate-600 mt-0.5">Tek komutla kurulum (docker-compose.yml) ve otomatik pytest hattı</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+          <button type="button" id="copyConfigBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-3 py-2.5 rounded-xl transition">
+            Tüm Proje JSON Kopyala
+          </button>
+          <button type="button" id="downloadConfigBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium text-xs px-3 py-2.5 rounded-xl transition">
+            config.json İndir
+          </button>
+          <button type="button" id="copyReadmeBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium text-xs px-3 py-2.5 rounded-xl transition">
+            README.md Kopyala
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Bildirimi -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 z-50">
+    Kaydedildi
+  </div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'yz_uygulamam_state_v2';
+
+      const defaultState = {
+        appName: 'Bağımsız YZ Stüdyo',
+        tone: 'samimi',
+        autoLearn: true,
+        systemPrompt: 'Sen kendi verisini üretebilen, sohbetten öğrenen ve sağlayıcıdan bağımsız çalışan full-stack yapay zeka asistanısın. Yanıtlarını onaylı bilgi tabanına dayandır.',
+        fallbackReply: 'Bu konuda onaylı bilgi tabanımda henüz kayıt yok. "Otonom" sekmesinden bu konu için veri üretebilir veya bana doğrudan kural öğretebilirsin.',
+        apiKey: '',
+        githubRepo: '',
+        knowledge: [
+          {
+            id: 'kb-1',
+            title: 'Uygulama Kimliği',
+            category: 'Genel',
+            keywords: 'kimsin, nedir, ne yapabilirsin, merhaba, yardım',
+            content: 'Ben kendi verisini üretebilen, sohbetten yeni kurallar öğrenebilen ve hem yerel Ollama modelleriyle hem de Gemini ile çalışabilen bağımsız yapay zeka uygulamanım.',
+            source: 'system'
+          },
+          {
+            id: 'kb-2',
+            title: 'Otonom Veri Döngüsü',
+            category: 'Mimari',
+            keywords: 'otonom, veri, öğren, sentetik, jsonl, eğitim',
+            content: 'Sohbetten Öğren açıkken verdiğin bilgi cümlelerini otomatik taslağa çeviririm. Ayrıca Otonom sekmesinden tek dokunuşla konu bazlı veri taslakları ve JSONL eğitim seti üretebilirsin.',
+            source: 'system'
+          },
+          {
+            id: 'kb-3',
+            title: 'GitHub Full-Stack ve Drive Yedeği',
+            category: 'Teknik',
+            keywords: 'github, drive, kayıt, yedek, depo, fullstack, docker',
+            content: 'Proje şu an Google Drive klasöründe yedekleniyor. İstediğin an full-stack paketi GitHub depona yükleyip Docker ve Ollama ile tamamen bağımsız sunucuda çalıştırabilirsin.',
+            source: 'system'
+          }
+        ],
+        drafts: [],
+        messages: [
+          {
+            role: 'ai',
+            text: 'v0.2 Otonom Full-Stack sürümü hazır! Bana yeni bir kural öğret (ör. "Yeni kural: ...") — otomatik olarak Otonom Taslaklara kaydedeyim; ya da Otonom sekmesinden sentetik veri üret.',
+            source: 'Sistem v0.2 Başlatıldı'
+          }
+        ]
+      };
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return JSON.parse(JSON.stringify(defaultState));
+          const parsed = JSON.parse(raw);
+          return Object.assign(JSON.parse(JSON.stringify(defaultState)), parsed);
+        } catch (e) {
+          return JSON.parse(JSON.stringify(defaultState));
+        }
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          // Storage blocked; stay in-memory
+        }
+      }
+
+      let state = loadState();
+      let toastTimer = null;
+
+      function showToast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.remove('opacity-0');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.add('opacity-0'), 2300);
+      }
+
+      function copyText(text, successMsg) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => showToast(successMsg)).catch(() => fallbackCopy(text, successMsg));
+        } else {
+          fallbackCopy(text, successMsg);
+        }
+      }
+
+      function fallbackCopy(text, successMsg) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast(successMsg);
+        } catch (e) {
+          showToast('Kopyalama desteklenmedi');
+        }
+        document.body.removeChild(ta);
+      }
+
+      function downloadFile(filename, content, mime) {
+        const blob = new Blob([content], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(filename + ' indirildi');
+      }
+
+      function normalize(str) {
+        return (str || '')
+          .toLocaleLowerCase('tr-TR')
+          .replace(/[^a-zçğıöşü0-9\s]/gi, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function findBestMatches(query) {
+        const qNorm = normalize(query);
+        const tokens = qNorm.split(' ').filter(w => w.length > 2);
+        if (!tokens.length) return [];
+
+        const scored = state.knowledge.map(item => {
+          const hayTitle = normalize(item.title);
+          const hayKeys = normalize(item.keywords);
+          const hayBody = normalize(item.content);
+          let score = 0;
+
+          tokens.forEach(t => {
+            if (hayKeys.includes(t)) score += 4;
+            if (hayTitle.includes(t)) score += 3;
+            if (hayBody.includes(t)) score += 1.5;
+          });
+
+          return { item, score };
+        }).filter(x => x.score > 0);
+
+        scored.sort((a, b) => b.score - a.score);
+        return scored.slice(0, 2);
+      }
+
+      function extractCandidateFromChat(text) {
+        const clean = (text || '').trim();
+        if (clean.length < 18 || clean.endsWith('?')) return null;
+        const words = normalize(clean).split(' ').filter(w => w.length > 3);
+        const uniqueWords = Array.from(new Set(words)).slice(0, 6);
+        const shortTitle = clean.slice(0, 44).replace(/[.,;:\s]+$/, '') + (clean.length > 44 ? '...' : '');
+        return {
+          id: 'draft-' + Date.now(),
+          title: 'Öğrenilen: ' + shortTitle,
+          category: 'Otonom Öğrenme',
+          keywords: uniqueWords.join(', '),
+          content: clean,
+          source: 'sohbet-otonom',
+          confidence: 0.86
+        };
+      }
+
+      function synthesizeLocalRecords(topic, count) {
+        const clean = topic.trim();
+        const templates = [
+          { label: 'Temel Tanım', body: `${clean} konusunda temel çerçeve: amaç, kapsam ve beklenen çıktı standartları.` },
+          { label: 'Sık Sorulan Soru', body: `${clean} hakkında kullanıcıların en sık sorduğu soruya net ve adım adım yanıt.` },
+          { label: 'Kural ve Sınırlar', body: `${clean} sürecinde yapay zekanın uyması gereken doğruluk, güvenlik ve üslup ilkeleri.` },
+          { label: 'Örnek Senaryo', body: `${clean} için gerçek bir talepte uygulanacak uçtan uca örnek diyalog akışı.` },
+          { label: 'Hata & İstisna Yönetimi', body: `${clean} sırasında eksik bilgi gelirse kullanıcıya sorulacak netleştirici soru şablonu.` }
+        ];
+        return templates.slice(0, count).map((tpl, i) => ({
+          id: 'draft-syn-' + Date.now() + '-' + i,
+          title: `${clean} — ${tpl.label}`,
+          category: 'Sentetik Veri',
+          keywords: `${normalize(clean)}, ${normalize(tpl.label)}`,
+          content: tpl.body,
+          source: 'otonom-uretici',
+          confidence: 0.80
+        }));
+      }
+
+      function tonePrefix() {
+        switch (state.tone) {
+          case 'resmi': return 'Bilgilendirme: ';
+          case 'kisa': return '';
+          case 'teknik': return '[RAG Eşleşmesi] ';
+          default: return '';
+        }
+      }
+
+      async function generateReply(userText) {
+        const matches = findBestMatches(userText);
+        let captured = null;
+
+        if (state.autoLearn) {
+          captured = extractCandidateFromChat(userText);
+          if (captured) {
+            state.drafts.unshift(captured);
+          }
+        }
+
+        if (state.apiKey && state.apiKey.trim().length > 10) {
+          try {
+            const kbContext = state.knowledge
+              .map(k => `- ${k.title} (${k.category || 'Genel'}): ${k.content}`)
+              .join('\n');
+
+            const fullPrompt = `${state.systemPrompt}\nTon: ${state.tone}\n\nBilgi Tabanı:\n${kbContext}\n\nKullanıcı: ${userText}`;
+            const res = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(state.apiKey.trim())}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }] })
+              }
+            );
+            if (!res.ok) throw new Error('API başarısız');
+            const data = await res.json();
+            const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (replyText) {
+              return {
+                text: replyText.trim(),
+                source: captured
+                  ? 'Gemini 2.5 Flash • +1 Otonom Taslak yakalandı'
+                  : 'Gemini 2.5 Flash (Canlı API)'
+              };
+            }
+          } catch (err) {
+            // Yerel moda düş
+          }
+        }
+
+        if (captured) {
+          return {
+            text: `Anladım, bu bilgiyi otonom olarak yakalayıp "Otonom" sekmesindeki taslak havuzuna ekledim. Onayladığında kalıcı bilgi tabanıma geçecek.`,
+            source: 'Otonom Öğrenme • +1 Taslak oluşturuldu'
+          };
+        }
+
+        if (matches.length > 0) {
+          const top = matches[0].item;
+          return {
+            text: tonePrefix() + top.content,
+            source: `Kaynak: ${top.title} (${top.category || 'Genel'})`
+          };
+        }
+
+        return {
+          text: state.fallbackReply,
+          source: 'Eşleşen kayıt bulunamadı'
+        };
+      }
+
+      function renderHeader() {
+        document.getElementById('headerAppName').textContent = state.appName || 'Yapay Zeka Uygulamam';
+        document.getElementById('kbCountBadge').textContent = `${state.knowledge.length} Veri`;
+        const draftBadge = document.getElementById('draftCountBadge');
+        if (state.drafts.length > 0) {
+          draftBadge.textContent = `${state.drafts.length} Taslak`;
+          draftBadge.classList.remove('hidden');
+        } else {
+          draftBadge.classList.add('hidden');
+        }
+
+        const hasKey = state.apiKey && state.apiKey.trim().length > 10;
+        document.getElementById('modeLabel').textContent = hasKey ? 'v0.2 • Canlı Gemini API' : 'v0.2 • Otonom Yerel Mod';
+        document.getElementById('modeDot').className = hasKey
+          ? 'inline-block w-2 h-2 rounded-full bg-indigo-500'
+          : 'inline-block w-2 h-2 rounded-full bg-emerald-500';
+      }
+
+      function renderChat() {
+        document.getElementById('autoLearnToggle').checked = !!state.autoLearn;
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = '';
+        state.messages.forEach(msg => {
+          const wrap = document.createElement('div');
+          wrap.className = msg.role === 'user' ? 'flex justify-end' : 'flex justify-start';
+
+          const bubble = document.createElement('div');
+          bubble.className = msg.role === 'user'
+            ? 'bg-indigo-600 text-white rounded-2xl rounded-br-md px-3.5 py-2.5 max-w-[85%] text-sm shadow-sm'
+            : 'bg-slate-100 text-slate-800 rounded-2xl rounded-bl-md px-3.5 py-2.5 max-w-[88%] text-sm';
+
+          const textEl = document.createElement('p');
+          textEl.className = 'whitespace-pre-wrap leading-relaxed';
+          textEl.textContent = msg.text;
+          bubble.appendChild(textEl);
+
+          if (msg.source) {
+            const srcEl = document.createElement('p');
+            srcEl.className = 'text-[10px] mt-1.5 text-slate-500 font-medium';
+            srcEl.textContent = msg.source;
+            bubble.appendChild(srcEl);
+          }
+
+          wrap.appendChild(bubble);
+          container.appendChild(wrap);
+        });
+        container.scrollTop = container.scrollHeight;
+      }
+
+      function renderDrafts() {
+        const container = document.getElementById('draftList');
+        container.innerHTML = '';
+        if (!state.drafts.length) {
+          container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Henüz onay bekleyen otonom taslak yok. Yukarıdan konu girip üret veya sohbetten yeni bir kural öğret.</p>';
+          return;
+        }
+
+        state.drafts.forEach(draft => {
+          const card = document.createElement('div');
+          card.className = 'border border-amber-200 bg-amber-50/50 rounded-xl p-3 space-y-2';
+
+          const top = document.createElement('div');
+          top.className = 'flex items-start justify-between gap-2';
+
+          const info = document.createElement('div');
+          const h3 = document.createElement('h3');
+          h3.className = 'font-semibold text-sm text-slate-900';
+          h3.textContent = draft.title;
+          const badge = document.createElement('span');
+          badge.className = 'inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 mt-0.5';
+          badge.textContent = `${draft.category} • Güven %${Math.round((draft.confidence || 0.8) * 100)}`;
+          info.appendChild(h3);
+          info.appendChild(badge);
+
+          const actions = document.createElement('div');
+          actions.className = 'flex gap-1.5 shrink-0';
+
+          const approveBtn = document.createElement('button');
+          approveBtn.type = 'button';
+          approveBtn.className = 'text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition';
+          approveBtn.textContent = 'Onayla';
+          approveBtn.addEventListener('click', () => {
+            state.drafts = state.drafts.filter(d => d.id !== draft.id);
+            state.knowledge.unshift(Object.assign({}, draft, { id: 'kb-' + Date.now() }));
+            saveState();
+            renderHeader();
+            renderDrafts();
+            renderDataList();
+            showToast('Taslak bilgi tabanına onaylandı');
+          });
+
+          const rejectBtn = document.createElement('button');
+          rejectBtn.type = 'button';
+          rejectBtn.className = 'text-xs font-medium px-2 py-1 rounded-lg text-rose-600 hover:bg-rose-50 transition';
+          rejectBtn.textContent = 'Sil';
+          rejectBtn.addEventListener('click', () => {
+            state.drafts = state.drafts.filter(d => d.id !== draft.id);
+            saveState();
+            renderHeader();
+            renderDrafts();
+            showToast('Taslak silindi');
+          });
+
+          actions.appendChild(approveBtn);
+          actions.appendChild(rejectBtn);
+          top.appendChild(info);
+          top.appendChild(actions);
+
+          const body = document.createElement('p');
+          body.className = 'text-xs text-slate-700 leading-relaxed';
+          body.textContent = draft.content;
+
+          card.appendChild(top);
+          card.appendChild(body);
+          container.appendChild(card);
+        });
+      }
+
+      function renderDataList() {
+        const container = document.getElementById('dataList');
+        const q = normalize(document.getElementById('searchDataInput').value);
+        const filtered = state.knowledge.filter(item => {
+          if (!q) return true;
+          return normalize(`${item.title} ${item.category} ${item.keywords} ${item.content}`).includes(q);
+        });
+
+        container.innerHTML = '';
+        if (!filtered.length) {
+          container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Eşleşen veri kaydı bulunamadı.</p>';
+          return;
+        }
+
+        filtered.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'border border-slate-200 rounded-xl p-3 bg-slate-50/70 space-y-1.5';
+
+          const topRow = document.createElement('div');
+          topRow.className = 'flex items-start justify-between gap-2';
+
+          const titleWrap = document.createElement('div');
+          titleWrap.className = 'min-w-0';
+          const h3 = document.createElement('h3');
+          h3.className = 'font-semibold text-sm text-slate-900';
+          h3.textContent = item.title;
+          const cat = document.createElement('span');
+          cat.className = 'inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 mt-0.5';
+          cat.textContent = item.category || 'Genel';
+          titleWrap.appendChild(h3);
+          titleWrap.appendChild(cat);
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'text-xs text-rose-600 hover:text-rose-700 font-medium shrink-0 px-2 py-1 rounded-lg hover:bg-rose-50 transition';
+          delBtn.textContent = 'Sil';
+          delBtn.addEventListener('click', () => {
+            state.knowledge = state.knowledge.filter(k => k.id !== item.id);
+            saveState();
+            renderHeader();
+            renderDataList();
+            showToast('Kayıt silindi');
+          });
+
+          topRow.appendChild(titleWrap);
+          topRow.appendChild(delBtn);
+
+          const body = document.createElement('p');
+          body.className = 'text-xs text-slate-700 leading-relaxed';
+          body.textContent = item.content;
+
+          card.appendChild(topRow);
+          card.appendChild(body);
+
+          if (item.keywords) {
+            const kw = document.createElement('p');
+            kw.className = 'text-[11px] text-slate-500';
+            kw.textContent = 'Anahtar kelimeler: ' + item.keywords;
+            card.appendChild(kw);
+          }
+
+          container.appendChild(card);
+        });
+      }
+
+      function renderBrainForm() {
+        document.getElementById('appNameInput').value = state.appName;
+        document.getElementById('toneSelect').value = state.tone;
+        document.getElementById('systemPromptInput').value = state.systemPrompt;
+        document.getElementById('fallbackInput').value = state.fallbackReply;
+        document.getElementById('apiKeyInput').value = state.apiKey;
+        updatePromptStats();
+      }
+
+      function updatePromptStats() {
+        const len = document.getElementById('systemPromptInput').value.length;
+        document.getElementById('promptStats').textContent = `${len} karakter (~${Math.ceil(len / 4)} token)`;
+      }
+
+      function renderGithub() {
+        document.getElementById('githubRepoInput').value = state.githubRepo || '';
+        const box = document.getElementById('savedRepoBox');
+        if (state.githubRepo) {
+          box.classList.remove('hidden');
+          document.getElementById('savedRepoText').textContent = state.githubRepo;
+          document.getElementById('savedRepoLink').href = state.githubRepo;
+        } else {
+          box.classList.add('hidden');
+        }
+      }
+
+      // Sekme geçişleri
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-tab');
+          document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('tab-active');
+            b.classList.add('tab-inactive');
+          });
+          btn.classList.add('tab-active');
+          btn.classList.remove('tab-inactive');
+
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+          document.getElementById('panel-' + target).classList.remove('hidden');
+        });
+      });
+
+      document.getElementById('autoLearnToggle').addEventListener('change', e => {
+        state.autoLearn = e.target.checked;
+        saveState();
+        showToast(state.autoLearn ? 'Sohbetten otomatik öğrenme açık' : 'Otomatik öğrenme kapatıldı');
+      });
+
+      // Sohbet
+      async function handleSend(text) {
+        const trimmed = (text || '').trim();
+        if (!trimmed) return;
+        state.messages.push({ role: 'user', text: trimmed });
+        renderChat();
+
+        const sendBtn = document.getElementById('sendBtn');
+        sendBtn.disabled = true;
+        sendBtn.textContent = '...';
+
+        const reply = await generateReply(trimmed);
+        state.messages.push({ role: 'ai', text: reply.text, source: reply.source });
+        saveState();
+        renderHeader();
+        renderChat();
+        renderDrafts();
+
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Gönder';
+      }
+
+      document.getElementById('chatForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const input = document.getElementById('chatInput');
+        const val = input.value;
+        input.value = '';
+        handleSend(val);
+      });
+
+      document.querySelectorAll('.quick-prompt-btn').forEach(btn => {
+        btn.addEventListener('click', () => handleSend(btn.textContent));
+      });
+
+      document.getElementById('clearChatBtn').addEventListener('click', () => {
+        state.messages = [{
+          role: 'ai',
+          text: 'Sohbet temizlendi. Soru sorabilir veya yeni bir kural öğretebilirsin.',
+          source: 'Hazır'
+        }];
+        saveState();
+        renderChat();
+        showToast('Sohbet temizlendi');
+      });
+
+      // Otonom Veri Üretici
+      document.getElementById('synthForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const topic = document.getElementById('synthTopic').value.trim();
+        const count = parseInt(document.getElementById('synthCount').value, 10) || 3;
+        const autoApprove = document.getElementById('synthAutoApprove').checked;
+        if (!topic) return;
+
+        const generated = synthesizeLocalRecords(topic, count);
+        if (autoApprove) {
+          state.knowledge = generated.concat(state.knowledge);
+          showToast(`${generated.length} sentetik kayıt doğrudan onaylandı`);
+        } else {
+          state.drafts = generated.concat(state.drafts);
+          showToast(`${generated.length} otonom taslak üretildi`);
+        }
+        document.getElementById('synthTopic').value = '';
+        saveState();
+        renderHeader();
+        renderDrafts();
+        renderDataList();
+      });
+
+      document.getElementById('approveAllDraftsBtn').addEventListener('click', () => {
+        if (!state.drafts.length) {
+          showToast('Onaylanacak taslak yok');
+          return;
+        }
+        const count = state.drafts.length;
+        state.knowledge = state.drafts.concat(state.knowledge);
+        state.drafts = [];
+        saveState();
+        renderHeader();
+        renderDrafts();
+        renderDataList();
+        showToast(`${count} taslak bilgi tabanına eklendi`);
+      });
+
+      document.getElementById('exportJsonlBtn').addEventListener('click', () => {
+        const lines = state.knowledge.map(item => JSON.stringify({
+          messages: [
+            { role: 'system', content: state.systemPrompt },
+            { role: 'user', content: `${item.title} hakkında bilgi ver.` },
+            { role: 'assistant', content: item.content }
+          ],
+          metadata: { category: item.category, keywords: item.keywords, source: item.source || 'manual' }
+        }));
+        downloadFile('egitim_verisi.jsonl', lines.join('\n'), 'application/x-ndjson');
+      });
+
+      // Manuel veri ekleme
+      document.getElementById('addDataForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const title = document.getElementById('dataTitle').value.trim();
+        const category = document.getElementById('dataCategory').value.trim() || 'Genel';
+        const keywords = document.getElementById('dataKeywords').value.trim();
+        const content = document.getElementById('dataContent').value.trim();
+        if (!title || !content) return;
+
+        state.knowledge.unshift({
+          id: 'kb-' + Date.now(),
+          title,
+          category,
+          keywords,
+          content,
+          source: 'manual'
+        });
+        saveState();
+        e.target.reset();
+        renderHeader();
+        renderDataList();
+        showToast('Yeni veri eklendi');
+      });
+
+      document.getElementById('searchDataInput').addEventListener('input', renderDataList);
+
+      document.getElementById('importJsonInput').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            const parsed = JSON.parse(ev.target.result);
+            const items = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.knowledge) ? parsed.knowledge : null);
+            if (!items) throw new Error('Geçersiz format');
+            const valid = items.filter(x => x && x.title && x.content).map((x, idx) => ({
+              id: x.id || ('kb-imp-' + Date.now() + '-' + idx),
+              title: String(x.title),
+              category: String(x.category || 'İçe Aktarılan'),
+              keywords: String(x.keywords || ''),
+              content: String(x.content),
+              source: 'import'
+            }));
+            if (!valid.length) throw new Error('Boş liste');
+            state.knowledge = valid.concat(state.knowledge);
+            saveState();
+            renderHeader();
+            renderDataList();
+            showToast(`${valid.length} kayıt içe aktarıldı`);
+          } catch (err) {
+            showToast('JSON dosyası okunamadı');
+          }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+      });
+
+      document.getElementById('exportDataBtn').addEventListener('click', () => {
+        downloadFile('bilgi_tabani.json', JSON.stringify(state.knowledge, null, 2), 'application/json');
+      });
+
+      // Talimat / Beyin formu
+      document.getElementById('systemPromptInput').addEventListener('input', updatePromptStats);
+      document.getElementById('brainForm').addEventListener('submit', e => {
+        e.preventDefault();
+        state.appName = document.getElementById('appNameInput').value.trim() || 'Bağımsız YZ Stüdyo';
+        state.tone = document.getElementById('toneSelect').value;
+        state.systemPrompt = document.getElementById('systemPromptInput').value.trim();
+        state.fallbackReply = document.getElementById('fallbackInput').value.trim();
+        state.apiKey = document.getElementById('apiKeyInput').value.trim();
+        saveState();
+        renderHeader();
+        showToast('Asistan ayarları kaydedildi');
+      });
+
+      // GitHub
+      document.getElementById('githubForm').addEventListener('submit', e => {
+        e.preventDefault();
+        state.githubRepo = document.getElementById('githubRepoInput').value.trim();
+        saveState();
+        renderGithub();
+        showToast('GitHub depo adresi kaydedildi');
+      });
+
+      function buildExportBundle() {
+        return {
+          version: '0.2.0',
+          appName: state.appName,
+          tone: state.tone,
+          autoLearn: state.autoLearn,
+          systemPrompt: state.systemPrompt,
+          fallbackReply: state.fallbackReply,
+          githubRepo: state.githubRepo,
+          knowledge: state.knowledge,
+          drafts: state.drafts
+        };
+      }
+
+      document.getElementById('copyConfigBtn').addEventListener('click', () => {
+        copyText(JSON.stringify(buildExportBundle(), null, 2), 'Proje JSON panoya kopyalandı');
+      });
+
+      document.getElementById('downloadConfigBtn').addEventListener('click', () => {
+        downloadFile('config.json', JSON.stringify(buildExportBundle(), null, 2), 'application/json');
+      });
+
+      document.getElementById('copyReadmeBtn').addEventListener('click', () => {
+        const readme = `# ${state.appName} (Full-Stack v0.2)\n\nKendi verisini üretebilen, sohbetten öğrenen ve bağımsız çalışabilen full-stack yapay zeka uygulaması.\n\n## Çalıştırma\n\`\`\`bash\ncp .env.example .env\ndocker compose --profile local-llm up --build\n\`\`\`\n`;
+        copyText(readme, 'README.md panoya kopyalandı');
+      });
+
+      renderHeader();
+      renderChat();
+      renderDrafts();
+      renderDataList();
+      renderBrainForm();
+      renderGithub();
+    })();
+  </script>
+</body>
+</html>
