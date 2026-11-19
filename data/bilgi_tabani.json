@@ -1,0 +1,42 @@
+[
+  {
+    "id": "kb-1",
+    "title": "Yerel Hibrit Akıl Yürütme Motoru",
+    "category": "Mimari",
+    "keywords": "motor, hafıza, akıl yürütme, bm25, yerel, nasıl, çalışır, bağımsız",
+    "content": "Tamamen cihazında çevrimdışı çalışan hibrit bir motor kullanıyorum: Türkçe kök ayrıştırma, yazım hatasına dayanıklı trigram benzerliği ve BM25 sıralama algoritmasıyla en ilgili kayıtları bulup sentezliyorum.",
+    "source": "system"
+  },
+  {
+    "id": "kb-2",
+    "title": "Otonom Öğrenme ve Çakışma Kontrolü",
+    "category": "Kural",
+    "keywords": "öğren, kural, otonom, taslak, hafıza, güncelleme",
+    "content": "Sohbette \"Öğren:\", \"Kural:\" veya bilgi cümlesi yazdığında bunu otomatik olarak analiz eder, anahtar kelimelerini çıkarır ve hafıza taslaklarına eklerim. Aynı konuda kayıt varsa çakışma uyarısı veririm.",
+    "source": "system"
+  },
+  {
+    "id": "kb-3",
+    "title": "Akıllı Hesaplama ve Finans Aracı",
+    "category": "Yetenek",
+    "keywords": "hesap, kdv, yüzde, fiyat, indirim, matematik, toplama, çarpma",
+    "content": "Doğal dille yazılan KDV dahil/hariç fiyat, indirim yüzdesi ve dört işlem hesaplamalarını (ör. \"1250 TL %20 KDV dahil ne kadar?\") yerel araç motorumla hatasız hesaplarım.",
+    "source": "system"
+  },
+  {
+    "id": "kb-4",
+    "title": "Profesyonel Yanıt ve Doğruluk Kuralı",
+    "category": "Kural",
+    "keywords": "doğruluk, kaynak, profesyonel, üslup, kalite, kural",
+    "content": "Her yanıtta hangi hafıza kayıtlarını kullandığımı, eşleşme güven yüzdesini ve düşünme adımlarımı şeffaf biçimde gösteririm; uydurma bilgi üretmem.",
+    "source": "system"
+  },
+  {
+    "id": "kb-5",
+    "title": "Belge Parçalama ve JSONL Eğitim Seti",
+    "category": "Yetenek",
+    "keywords": "belge, metin, parçala, chunk, jsonl, eğitim, veri",
+    "content": "Öğret sekmesine uzun notlar veya dokümanlar yapıştırdığında her paragrafı ayrı bir anlamsal parçaya (chunk) ayırıp otomatik etiketler ve fine-tuning uyumlu JSONL formatına dönüştürürüm.",
+    "source": "system"
+  }
+]
